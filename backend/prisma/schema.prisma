@@ -1,0 +1,79 @@
+// =============================================================
+// IBÉRICOS MACARENA · Prisma schema
+// PostgreSQL · listo para producción y para escalar a ecommerce
+// =============================================================
+//
+// Modelos núcleo (los pedidos): User, Product, Review.
+// Campos extra opcionales para SEO local, filtros y moderación.
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// USER
+// -------------------------------------------------------------
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt — NUNCA se devuelve al cliente
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  ADMIN
+}
+
+// -------------------------------------------------------------
+// PRODUCT
+// -------------------------------------------------------------
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  image       String?
+  stock       Int      @default(0)
+
+  // Campos extra para SEO / catálogo (no rompen los modelos básicos)
+  slug      String   @unique
+  category  String   @default("otros") // jamon | paleta | embutido | loncheado | otros
+  priceUnit String   @default("kg") // kg, pieza, 100g, pack
+  tag       String? // "Estrella", "Bellota"…
+  featured  Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category, active])
+  @@index([slug])
+  @@map("products")
+}
+
+// -------------------------------------------------------------
+// REVIEW
+// -------------------------------------------------------------
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  rating    Int // 1..5
+  comment   String   @db.Text
+  status    String   @default("APPROVED") // PENDING | APPROVED | REJECTED
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@map("reviews")
+}

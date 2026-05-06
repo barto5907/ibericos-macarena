@@ -1,0 +1,3 @@
+Servidor:
+Iniciar el servidor: npm.cmd run dev // npm run start (Para cuando lance la web a railway).
+Prisma Studio → opcional, solo cuando quieras ver/editar la BD: npm.cmd run prisma:studio
