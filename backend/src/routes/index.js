@@ -8,6 +8,7 @@ import { authRouter } from "./auth.routes.js";
 import { productsRouter } from "./products.routes.js";
 import { reviewsRouter } from "./reviews.routes.js";
 import { seoRouter } from "./seo.routes.js";
+import { businessRouter } from "./business.routes.js";
 import { apiLimiter } from "../middleware/rateLimit.middleware.js";
 import { isPrismaReady } from "../config/prisma.js";
 
@@ -31,3 +32,4 @@ router.use("/auth", authRouter);
 router.use("/products", productsRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/seo", seoRouter);
+router.use("/business", businessRouter);

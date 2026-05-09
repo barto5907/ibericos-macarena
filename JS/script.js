@@ -23,6 +23,7 @@
     register: API_BASE + "/api/auth/register",
     me: API_BASE + "/api/auth/me",
     logout: API_BASE + "/api/auth/logout",
+    business: API_BASE + "/api/business/status",
   };
 
   const COOKIE_KEY = "im_cookie_consent_v1";
@@ -80,23 +81,51 @@
   onScroll();
 
   /* ------------------------------------------------------------
-     Menú móvil
+     Drawer lateral (menú hamburguesa siempre visible)
   ------------------------------------------------------------ */
   const navToggle = $("#navToggle");
-  if (navToggle) {
-    navToggle.addEventListener("click", () => {
-      const open = document.body.classList.toggle("menu-open");
-      navToggle.classList.toggle("is-open", open);
-      navToggle.setAttribute("aria-expanded", String(open));
-    });
-    $$(".nav a").forEach((a) =>
-      a.addEventListener("click", () => {
-        document.body.classList.remove("menu-open");
-        navToggle.classList.remove("is-open");
-        navToggle.setAttribute("aria-expanded", "false");
-      })
-    );
+  const navDrawer = $("#navDrawer");
+  const navOverlay = $("#navOverlay");
+  const navClose = $("#navClose");
+
+  function openDrawer() {
+    if (!navDrawer) return;
+    navDrawer.classList.add("is-open");
+    navOverlay.hidden = false;
+    requestAnimationFrame(() => navOverlay.classList.add("is-open"));
+    navToggle?.setAttribute("aria-expanded", "true");
+    navDrawer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
   }
+  function closeDrawer() {
+    if (!navDrawer) return;
+    navDrawer.classList.remove("is-open");
+    navOverlay.classList.remove("is-open");
+    navToggle?.setAttribute("aria-expanded", "false");
+    navDrawer.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    // Esperar a la transición antes de hidden=true (para a11y)
+    setTimeout(() => { if (navOverlay) navOverlay.hidden = true; }, 400);
+  }
+
+  navToggle?.addEventListener("click", () => {
+    const isOpen = navDrawer?.classList.contains("is-open");
+    if (isOpen) closeDrawer(); else openDrawer();
+  });
+  navClose?.addEventListener("click", closeDrawer);
+  navOverlay?.addEventListener("click", closeDrawer);
+
+  // Cerrar al hacer clic en cualquier enlace del drawer
+  $$(".nav-drawer .nav a").forEach((a) =>
+    a.addEventListener("click", () => closeDrawer())
+  );
+
+  // Cerrar con Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && navDrawer?.classList.contains("is-open")) {
+      closeDrawer();
+    }
+  });
 
   /* ------------------------------------------------------------
      Scroll reveal genérico
@@ -724,6 +753,201 @@
 
   // Comprobación inicial al cargar la página
   refreshAuthState();
+
+
+  /* ============================================================
+     HORARIO DINÁMICO + STATUS PILL
+     Se actualiza cada 60s para que "abierto/cerrado" sea preciso
+     incluso si el usuario deja la pestaña abierta.
+  ============================================================ */
+  const statusPill = $("#statusPill");
+  const hoursTable = $("#hoursTable");
+  const hoursBadge = $("#hoursBadge");
+  const hoursStatus = $("#hoursStatus");
+
+  const DAYS_LABEL = {
+    1: "Lun", 2: "Mar", 3: "Mié", 4: "Jue",
+    5: "Vie", 6: "Sáb", 0: "Dom",
+  };
+
+  function formatSlots(slots) {
+    if (!slots || slots.length === 0) return "Cerrado";
+    return slots.map((s) => `${s.opens} – ${s.closes}`).join(" · ");
+  }
+
+  /** Agrupa días con el mismo horario. */
+  function groupSchedule(schedule) {
+    const order = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 0: 7 };
+    const ordered = [...schedule].sort((a, b) => order[a.weekday] - order[b.weekday]);
+    const groups = [];
+    let current = null;
+    for (const day of ordered) {
+      const key = JSON.stringify(day.slots);
+      if (current && current.key === key) {
+        current.end = day;
+      } else {
+        if (current) groups.push(current);
+        current = { key, start: day, end: day, slots: day.slots };
+      }
+    }
+    if (current) groups.push(current);
+    return groups;
+  }
+
+  function isWeekdayInRange(target, start, end) {
+    const order = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 0: 7 };
+    return order[target] >= order[start] && order[target] <= order[end];
+  }
+
+  function renderSchedule(data) {
+    if (!data) return;
+
+    // Status pill en el header
+    if (statusPill && data.status) {
+      const s = data.status;
+      statusPill.classList.remove("is-open", "is-closed");
+      statusPill.classList.add(s.open ? "is-open" : "is-closed");
+      const text = statusPill.querySelector(".status-text");
+      if (text) {
+        text.innerHTML = s.open
+          ? `<strong>Abierto ahora</strong><span class="status-text-extra"> · cierra ${s.closesAt}</span>`
+          : `<strong>Cerrado</strong>`;
+      }
+      statusPill.title = s.message || "";
+    }
+
+    // Badge de temporada
+    if (hoursBadge) {
+      hoursBadge.textContent = data.season === "summer" ? "Verano" : "Invierno";
+    }
+
+    // Tabla agrupada
+    if (hoursTable && Array.isArray(data.schedule)) {
+      const groups = groupSchedule(data.schedule);
+      const today = new Date().getDay();
+      hoursTable.innerHTML = groups.map((g) => {
+        const label = g.start.weekday === g.end.weekday
+          ? DAYS_LABEL[g.start.weekday]
+          : `${DAYS_LABEL[g.start.weekday]} – ${DAYS_LABEL[g.end.weekday]}`;
+        const inRange = isWeekdayInRange(today, g.start.weekday, g.end.weekday);
+        return `
+          <tr${inRange ? ' class="is-today"' : ""}>
+            <th>${label}</th>
+            <td>${escapeHtml(formatSlots(g.slots))}</td>
+          </tr>`;
+      }).join("");
+    }
+
+    // Mensaje de estado
+    if (hoursStatus && data.status) {
+      const s = data.status;
+      hoursStatus.classList.remove("is-open", "is-closed");
+      hoursStatus.classList.add(s.open ? "is-open" : "is-closed");
+      hoursStatus.textContent = s.message || "";
+    }
+  }
+
+  async function loadBusinessStatus() {
+    try {
+      const res = await fetch(ENDPOINTS.business, {
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) {
+        renderSchedule(await res.json());
+        return;
+      }
+    } catch { /* fallback */ }
+
+    if (statusPill) {
+      const text = statusPill.querySelector(".status-text");
+      if (text) text.textContent = "Consulta horario";
+    }
+  }
+
+  loadBusinessStatus();
+  setInterval(loadBusinessStatus, 60_000);
+
+  /* ============================================================
+     GALERÍA + LIGHTBOX
+     Si window.GALLERY_IMAGES está definido (en index.html cuando
+     lleguen las fotos), renderiza el grid. Si no, deja el estado
+     vacío que ya hay en el HTML.
+  ============================================================ */
+  const galleryGrid = $("#galleryGrid");
+  const lightbox = $("#lightbox");
+  const lightboxImg = $("#lightboxImg");
+  const lightboxCaption = $("#lightboxCaption");
+  const lightboxClose = $("#lightboxClose");
+  const lightboxPrev = $("#lightboxPrev");
+  const lightboxNext = $("#lightboxNext");
+
+  let galleryImages = [];
+  let lightboxIndex = 0;
+
+  function renderGallery(images) {
+    if (!galleryGrid || !Array.isArray(images) || images.length === 0) return;
+    galleryImages = images;
+    galleryGrid.innerHTML = images.map((img, i) => `
+      <figure class="gallery-item" data-index="${i}" tabindex="0" role="button" aria-label="Ampliar: ${escapeHtml(img.caption || img.alt || '')}">
+        <img src="${escapeHtml(img.src)}"
+             alt="${escapeHtml(img.alt || '')}"
+             loading="lazy"
+             decoding="async" />
+        ${img.caption ? `<figcaption class="gallery-caption">${escapeHtml(img.caption)}</figcaption>` : ""}
+      </figure>
+    `).join("");
+
+    $$(".gallery-item", galleryGrid).forEach((el) => {
+      el.addEventListener("click", () => openLightbox(Number(el.dataset.index)));
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openLightbox(Number(el.dataset.index));
+        }
+      });
+    });
+  }
+
+  function openLightbox(index) {
+    if (!lightbox || galleryImages.length === 0) return;
+    lightboxIndex = index;
+    const img = galleryImages[index];
+    if (!img) return;
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt || "";
+    lightboxCaption.textContent = img.caption || "";
+    lightbox.hidden = false;
+    requestAnimationFrame(() => lightbox.classList.add("is-open"));
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove("is-open");
+    document.body.style.overflow = "";
+    setTimeout(() => { lightbox.hidden = true; }, 350);
+  }
+  function shiftImage(dir) {
+    if (galleryImages.length === 0) return;
+    lightboxIndex = (lightboxIndex + dir + galleryImages.length) % galleryImages.length;
+    openLightbox(lightboxIndex);
+  }
+
+  lightboxClose?.addEventListener("click", closeLightbox);
+  lightboxNext?.addEventListener("click", () => shiftImage(1));
+  lightboxPrev?.addEventListener("click", () => shiftImage(-1));
+  lightbox?.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!lightbox || lightbox.hidden) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") shiftImage(1);
+    if (e.key === "ArrowLeft") shiftImage(-1);
+  });
+
+  if (Array.isArray(window.GALLERY_IMAGES) && window.GALLERY_IMAGES.length > 0) {
+    renderGallery(window.GALLERY_IMAGES);
+  }
 
 
   const banner = $("#cookieBanner");

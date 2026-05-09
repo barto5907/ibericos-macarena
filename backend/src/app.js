@@ -31,6 +31,13 @@ const FRONTEND_ROOT = path.resolve(__dirname, "..", "..");
 const HTML_DIR = path.join(FRONTEND_ROOT, "HTML");
 const STYLES_DIR = path.join(FRONTEND_ROOT, "Styles");
 const JS_DIR = path.join(FRONTEND_ROOT, "JS");
+// `static/` (minúsculas, convención web) o `Static/` si en Windows ya existe.
+// Probamos primero la versión en minúsculas; si no, caemos a la mayúscula.
+const STATIC_DIR_LOWER = path.join(FRONTEND_ROOT, "static");
+const STATIC_DIR_UPPER = path.join(FRONTEND_ROOT, "Static");
+const STATIC_DIR = fs.existsSync(STATIC_DIR_LOWER)
+  ? STATIC_DIR_LOWER
+  : STATIC_DIR_UPPER;
 
 export const app = express();
 
@@ -155,11 +162,27 @@ const staticOpts = {
   lastModified: true,
 };
 
+// Caché más larga para imágenes/assets (rara vez cambian, ahorra ancho de banda)
+const assetOpts = {
+  maxAge: isProd ? "30d" : 0,
+  etag: true,
+  lastModified: true,
+  immutable: isProd,
+};
+
 if (fs.existsSync(STYLES_DIR))
   app.use("/Styles", express.static(STYLES_DIR, staticOpts));
 if (fs.existsSync(JS_DIR)) app.use("/JS", express.static(JS_DIR, staticOpts));
 if (fs.existsSync(HTML_DIR))
   app.use("/HTML", express.static(HTML_DIR, staticOpts));
+
+// Carpeta `static/` (imágenes, fotos, assets).
+// Aceptamos tanto /static/... como /Static/... como /STATIC/... para evitar
+// roturas por casing entre Windows (case-insensitive) y Linux (case-sensitive).
+if (fs.existsSync(STATIC_DIR)) {
+  app.use("/static", express.static(STATIC_DIR, assetOpts));
+  app.use("/Static", express.static(STATIC_DIR, assetOpts));
+}
 
 // Página de inicio
 app.get(["/", "/inicio"], (_req, res, next) => {

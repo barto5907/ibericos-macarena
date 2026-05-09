@@ -6,6 +6,12 @@
 
 import { listProducts } from "../services/products.service.js";
 import { getRatingSummary } from "../services/reviews.service.js";
+import {
+  getOpeningHoursSpec,
+  getBusinessStatus,
+  getWeekSchedule,
+  isSummerSeason,
+} from "../utils/businessHours.js";
 
 const BUSINESS = {
   name: "Ibéricos Macarena",
@@ -55,26 +61,7 @@ export async function localBusiness(_req, res) {
       "@type": "GeoCoordinates",
       ...BUSINESS.geo,
     },
-    openingHoursSpecification: [
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "09:00",
-        closes: "14:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "17:30",
-        closes: "20:30",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: "Saturday",
-        opens: "09:00",
-        closes: "14:00",
-      },
-    ],
+    openingHoursSpecification: getOpeningHoursSpec(),
     areaServed: [
       { "@type": "City", name: "Bollullos Par del Condado" },
       { "@type": "AdministrativeArea", name: "Huelva" },

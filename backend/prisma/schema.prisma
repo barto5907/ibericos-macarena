@@ -50,7 +50,7 @@ model Product {
 
   // Campos extra para SEO / catálogo (no rompen los modelos básicos)
   slug      String   @unique
-  category  String   @default("otros") // jamon | paleta | embutido | loncheado | otros
+  category  String   @default("otros") // jamon | paleta | quesos | embutidos | loncheados | bacalao | conservas | otros
   priceUnit String   @default("kg") // kg, pieza, 100g, pack
   tag       String? // "Estrella", "Bellota"…
   featured  Boolean  @default(false)
