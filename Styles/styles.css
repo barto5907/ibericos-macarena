@@ -174,44 +174,43 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 400; color: var(--oxblood
   position: relative;
   padding: 6px 0;
 }
-.nav a::after {
-  content: ""; position: absolute; left: 50%; right: 50%; bottom: 0;
-  height: 1px; background: var(--oxblood);
-  transition: left .3s var(--ease), right .3s var(--ease);
-}
-.nav a:hover::after { left: 0; right: 0; }
 
 .nav-toggle {
-  display: none;
-  width: 42px; height: 42px;
-  background: transparent; border: 1px solid var(--line);
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--line);
   border-radius: 50%;
-  position: relative;
+  cursor: pointer;
+  transition: border-color .25s var(--ease), background .25s var(--ease);
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.nav-toggle:hover {
+  border-color: var(--ink);
+  background: var(--bone);
 }
 .nav-toggle span {
-  position: absolute; left: 11px; right: 11px; height: 1.4px; background: var(--ink);
-  transition: transform .3s var(--ease), opacity .25s var(--ease), top .3s var(--ease);
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--ink);
+  margin: 0 auto;
+  border-radius: 2px;
+  transition: transform .35s var(--ease), opacity .25s var(--ease);
 }
-.nav-toggle span:nth-child(1) { top: 14px; }
-.nav-toggle span:nth-child(2) { top: 20px; }
-.nav-toggle span:nth-child(3) { top: 26px; }
-.nav-toggle.is-open span:nth-child(1) { top: 20px; transform: rotate(45deg); }
-.nav-toggle.is-open span:nth-child(2) { opacity: 0; }
-.nav-toggle.is-open span:nth-child(3) { top: 20px; transform: rotate(-45deg); }
-
-@media (max-width: 880px) {
-  .nav-toggle { display: inline-flex; }
-  .nav {
-    position: fixed; inset: 76px 0 auto 0;
-    flex-direction: column; align-items: flex-start; gap: 6px;
-    background: var(--paper);
-    padding: 22px 28px 28px;
-    border-bottom: 1px solid var(--line-soft);
-    transform: translateY(-12px); opacity: 0; pointer-events: none;
-    transition: opacity .3s var(--ease), transform .3s var(--ease);
-  }
-  .nav a, .nav button.btn-link { font-size: 22px; padding: 10px 0; font-family: var(--ff-display); }
-  body.menu-open .nav { transform: translateY(0); opacity: 1; pointer-events: auto; }
+/* Animación a "X" cuando está abierto (usamos aria-expanded del nuevo drawer) */
+.nav-toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
 }
 
 /* =============================================================
@@ -345,17 +344,14 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 400; color: var(--oxblood
 }
 .chip {
   padding: 9px 18px;
-  border: 1px solid var(--line);
-  border-radius: 100px;
+  border: 0;
   background: transparent;
-  font-size: 13px; font-weight: 500;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-soft);
   letter-spacing: 0.02em;
-  transition: all .25s var(--ease);
-}
-.chip:hover { color: var(--ink); border-color: var(--ink); }
-.chip.is-active {
-  background: var(--ink); color: var(--bone); border-color: var(--ink);
+  cursor: pointer;
+  transition: color .25s var(--ease);
 }
 
 .product-grid {
@@ -1264,10 +1260,9 @@ h1 em, h2 em, h3 em { font-style: italic; font-weight: 400; color: var(--oxblood
 
 
 
-/* Mantener bloque de texto+sufijo en about-points alineado en línea */
+/* Mantener bloque de texto en about-points alineado en línea */
 .about-points strong { display: inline-flex; align-items: baseline; gap: 1px; }
-.about-points strong > span,
-.about-points strong .suffix {
+.about-points strong > span {
   font-family: var(--ff-display);
   font-size: 30px;
   font-weight: 500;
@@ -1746,8 +1741,6 @@ h1 em, h2 em, h3 em {
   justify-content: space-between;
   gap: 16px;
 }
-/* Quitar el menú visible del header (ahora va en drawer) */
-.site-header .nav-wrap > nav.nav { display: none; }
 
 /* —— Status pill (estado abierto/cerrado en header) —— */
 .status-pill {
@@ -1798,47 +1791,6 @@ h1 em, h2 em, h3 em {
 @media (max-width: 600px) {
   .status-pill { font-size: 11.5px; padding: 6px 12px 6px 10px; }
   .status-pill .status-text-extra { display: none; }
-}
-
-/* —— Botón hamburguesa SIEMPRE visible —— */
-.site-header .nav-toggle {
-  display: inline-flex !important;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: border-color .25s var(--ease), background .25s var(--ease);
-  margin-left: 4px;
-  flex-shrink: 0;
-}
-.site-header .nav-toggle:hover {
-  border-color: var(--ink);
-  background: var(--bone);
-}
-.site-header .nav-toggle span {
-  display: block;
-  width: 18px;
-  height: 1.5px;
-  background: var(--ink);
-  margin: 0 auto;
-  border-radius: 2px;
-  transition: transform .35s var(--ease), opacity .25s var(--ease);
-}
-/* Animación a "X" cuando está abierto */
-.site-header .nav-toggle[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(6.5px) rotate(45deg);
-}
-.site-header .nav-toggle[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
-}
-.site-header .nav-toggle[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-6.5px) rotate(-45deg);
 }
 
 /* —— Drawer lateral —— */
@@ -1940,7 +1892,6 @@ h1 em, h2 em, h3 em {
   opacity: 0.5;
 }
 .nav-drawer .nav a:last-child::before { display: none; }
-.nav-drawer .nav a::after { display: none; } /* Quitar el subrayado del nav original */
 .nav-drawer .nav a:hover {
   color: var(--oxblood);
   padding-left: 38px;
@@ -2224,3 +2175,406 @@ h1 em, h2 em, h3 em {
   .lightbox-prev { left: 12px; }
   .lightbox-next { right: 12px; }
 }
+
+/* =============================================================
+   REFINAMIENTOS EDITORIALES (v4)
+   Detalles que separan "web bien hecha" de "web memorable".
+   Cada bloque está pensado como una pequeña joya tipográfica
+   o de comportamiento. NO toca nada anterior.
+============================================================= */
+
+/* ── Textura sutil de "papel" en fondo paper ─────────────────
+   SVG inline con micro-noise. Casi imperceptible pero hace
+   que el fondo deje de sentirse "digital" y empiece a sentirse
+   como papel impreso. Truco de diseño editorial premium.
+*/
+body {
+  background-image:
+    /* grano ultra-sutil */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.025 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  background-size: 200px 200px;
+  background-attachment: fixed;
+}
+
+/* Para que el grano no aparezca sobre secciones oscuras */
+.hero, .contact, .site-footer {
+  position: relative;
+}
+.hero::before, .contact::before, .site-footer::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 0.95 0 0 0 0 0.9 0 0 0 0.018 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero > *, .contact > *, .site-footer > * { position: relative; z-index: 1; }
+
+
+/* ── Número de receta en tarjetas de producto ────────────────
+   "Nº 01", "Nº 02"… volado, italic, color gold-soft.
+   Inspirado en libros de recetas vintage y revistas culinarias.
+*/
+.product-grid { counter-reset: recipe; }
+.product-card { counter-increment: recipe; }
+.product-card .product-body { position: relative; }
+.product-card .product-body::before {
+  content: "Nº " counter(recipe, decimal-leading-zero);
+  position: absolute;
+  top: 26px;
+  right: 24px;
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.55;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+  pointer-events: none;
+}
+.product-card .product-name { padding-right: 44px; } /* hueco para el Nº */
+
+
+/* ── Numeración romana en section-heads ──────────────────────
+   Cada sección lleva un romano discreto sobre el eyebrow.
+   Da estructura editorial sin ser ostentoso.
+*/
+.section-head {
+  position: relative;
+}
+.section-head[data-section]::before {
+  content: attr(data-section);
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  opacity: 0.6;
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+
+
+/* ── Drop cap en "Sobre nosotros" ────────────────────────────
+   La primera letra del primer párrafo "normal" del about, en
+   grande, en Fraunces. Detalle de revista de cocina.
+*/
+.about-text h2 + p::first-letter {
+  font-family: var(--ff-display);
+  font-size: clamp(48px, 6.5vw, 72px);
+  font-weight: 500;
+  font-style: normal;
+  float: left;
+  line-height: 0.85;
+  margin: 6px 12px 0 0;
+  color: var(--oxblood);
+  font-variation-settings: "opsz" 144, "SOFT" 60;
+}
+
+
+/* ── Chip filtro con barra deslizante ────────────────────────
+   En vez de cambiar de color, una barra inferior fina
+   indica el activo. Mucho más editorial.
+*/
+.product-filters {
+  position: relative;
+}
+.chip {
+  position: relative;
+  color: var(--ink-soft);
+  transition: color .25s var(--ease);
+  padding: 10px 4px;
+  margin: 0 12px;
+}
+.chip::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: var(--oxblood);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .35s cubic-bezier(.7, 0, .2, 1);
+}
+.chip:hover { color: var(--ink); }
+.chip:hover::after { transform: scaleX(0.4); }
+.chip.is-active {
+  color: var(--oxblood);
+  font-weight: 500;
+}
+.chip.is-active::after { transform: scaleX(1); }
+
+
+/* ── Brand mark con micro-rotación al hover del header ───────
+   Pequeñísimo gesto que da vida.
+*/
+.brand .brand-mark svg {
+  transition: transform .5s cubic-bezier(.7, 0, .2, 1);
+}
+.brand:hover .brand-mark svg {
+  transform: rotate(-8deg) scale(1.05);
+}
+
+
+/* ── Aspect-ratio reservation en imágenes (anti-CLS) ─────────
+   Reserva el espacio antes de que carguen, evita saltos.
+*/
+.product-media,
+.review-avatar,
+.about-frame {
+  aspect-ratio: auto;
+}
+.product-media {
+  aspect-ratio: 4 / 3;
+}
+
+
+/* ── Scrollbar custom (Webkit/Chromium) ──────────────────────
+   Fina, color de marca. Detalle que solo se nota cuando se nota.
+*/
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bone);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-soft);
+  border-radius: 100px;
+  border: 3px solid var(--bone);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--oxblood);
+  background-clip: padding-box;
+  border: 3px solid var(--bone);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-soft) var(--bone);
+}
+
+
+/* ── Status pill: separador interior + microajuste ───────────
+*/
+.status-pill {
+  padding: 7px 16px 7px 14px;
+}
+.status-pill .status-dot {
+  margin-right: 4px;
+}
+
+
+/* ── Eyebrow con punto inicial decorativo ────────────────────
+   El "— " del eyebrow ahora es un punto+raya más estilizado.
+*/
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+
+/* ── Hover en review-cards más editorial ─────────────────────
+   En vez de "subir y sombra", la cita gira ligeramente.
+*/
+.review-card {
+  transition: transform .5s cubic-bezier(.7, 0, .2, 1),
+              box-shadow .5s var(--ease);
+}
+.review-card:hover {
+  transform: translateY(-4px) rotate(-0.4deg);
+}
+.review-card:nth-child(even):hover {
+  transform: translateY(-4px) rotate(0.4deg);
+}
+
+
+/* ── Underline animado en enlaces de navegación drawer ───────
+   El número 01, 02… ahora se subraya cuando hover sobre el link.
+*/
+.nav-drawer .nav a .nav-num {
+  position: relative;
+}
+.nav-drawer .nav a .nav-num::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: var(--oxblood);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .4s cubic-bezier(.7, 0, .2, 1);
+}
+.nav-drawer .nav a:hover .nav-num::after { transform: scaleX(1); }
+
+
+/* ── Detalle de cabecera del drawer: número total ────────────
+*/
+.nav-drawer-head {
+  align-items: baseline;
+}
+.nav-drawer-title::after {
+  content: " · 6 secciones";
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+  opacity: 0.5;
+  margin-left: 2px;
+  font-size: 12px;
+  text-transform: none;
+}
+
+
+/* ── Selección de texto refinada ─────────────────────────────
+*/
+::selection {
+  background: var(--oxblood);
+  color: var(--bone);
+}
+
+
+/* ── Botón primario: ligero halo dorado al hover ─────────────
+*/
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, var(--gold-soft) 50%, transparent 100%);
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform .8s cubic-bezier(.7, 0, .2, 1), opacity .3s var(--ease);
+  pointer-events: none;
+}
+.btn-primary:hover::before {
+  opacity: 0.25;
+  transform: translateX(100%);
+}
+
+
+/* ── Footer brand: lleva una "firma" italic ──────────────────
+*/
+.footer-brand p::after {
+  content: " — Macarena.";
+  font-family: var(--ff-display);
+  font-style: italic;
+  color: var(--gold-soft);
+  opacity: 0.65;
+}
+
+
+/* ── Refinamiento del about-points (2024 / Bellota / Local) ──
+   Línea vertical fina entre cada bloque, no solo arriba.
+*/
+.about-points {
+  position: relative;
+}
+.about-points li {
+  position: relative;
+  padding-right: 20px;
+}
+.about-points li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--line);
+}
+@media (max-width: 600px) {
+  .about-points li:not(:last-child)::after { display: none; }
+  .about-points li { padding-right: 0; }
+}
+
+
+/* ── Galería: estado "construcción" con animación sutil ──────
+*/
+.gallery-empty svg {
+  animation: emptyFloat 4s ease-in-out infinite;
+}
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+
+/* ── Inputs: línea bajo el texto en focus en vez de borde ────
+   Más editorial, menos "form de Bootstrap".
+   (Solo en inputs de un solo línea, no en textarea ni checks.)
+*/
+.review-form .field input:focus,
+.review-form .field textarea:focus,
+.field input:focus {
+  box-shadow: 0 0 0 4px rgba(107, 29, 29, 0.07),
+              inset 0 -2px 0 0 var(--oxblood);
+}
+
+
+/* ── Reduced motion: respetar preferencia del usuario ────────
+*/
+@media (prefers-reduced-motion: reduce) {
+  .review-card:hover {
+    transform: translateY(-4px);
+  }
+  .gallery-empty svg { animation: none; }
+  .brand:hover .brand-mark svg { transform: none; }
+}
+
+
+/* ── Print: si alguien imprime la web, que sea elegante ──────
+*/
+@media print {
+  .site-header, .site-footer, .nav-drawer, .nav-overlay,
+  .cookie-banner, .review-form-wrap, .review-gate,
+  .product-filters, .reviews-cta, .status-pill,
+  .nav-toggle, .lightbox {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .section { padding: 32px 0; page-break-inside: avoid; }
+  a { color: black; text-decoration: underline; }
+}
+
+/* ── Eyebrow del hero: el punto decorativo en gold-soft para contraste ──
+*/
+.hero .eyebrow::before {
+  background: var(--gold-soft);
+  opacity: 0.9;
+}
+
+/* ── Eyebrow dentro de hero-meta-items (etiquetas "label" pequeñas) ─────
+   Estos no llevan punto, son micro-etiquetas. Restaurar look original.
+*/
+.hero-meta .label {
+  display: inline;
+}
+.hero-meta .label::before { content: none; }
