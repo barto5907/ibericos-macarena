@@ -20,7 +20,7 @@ const BUSINESS = {
     "Charcutería especializada en productos ibéricos premium en Bollullos Par del Condado, Huelva. Jamón, paleta, lomo y embutidos artesanales.",
   url: "https://ibericosmacarena.com",
   telephone: "+34 616 778 900",
-  email: "ibericosmacarena@gmail.com",
+  email: "macarenapadillahiguera@gmail.com",
   address: {
     streetAddress: "Av. Constitución, 15",
     addressLocality: "Bollullos Par del Condado",

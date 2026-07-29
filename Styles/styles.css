@@ -2743,3 +2743,6 @@ body {
 .nav-drawer .nav a[aria-current="page"] .nav-num::after {
   transform: scaleX(1);
 }
+
+/* Dos teléfonos de contacto, uno debajo del otro */
+.contact-list li > div > a[href^="tel:"] { display: block; }
