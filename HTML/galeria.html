@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1a1410" />
+
+<title>Galería | Ibéricos Macarena · Charcutería en Bollullos Par del Condado</title>
+<meta name="description" content="Fotos de Ibéricos Macarena: jamones, embutidos, quesos y el día a día de nuestra charcutería en Bollullos Par del Condado, Huelva." />
+<link rel="canonical" href="https://ibericosmacarena.com/galeria" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Galería | Ibéricos Macarena" />
+<meta property="og:description" content="El producto y la tienda de Ibéricos Macarena en imágenes." />
+<meta property="og:url" content="https://ibericosmacarena.com/galeria" />
+<meta property="og:locale" content="es_ES" />
+
+<link rel="icon" type="image/png" sizes="32x32" href="../static/marca/favicon-32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="../static/marca/favicon-180.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../Styles/styles.css" />
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="container nav-wrap">
+    <a class="brand" href="index.html" aria-label="Ibéricos Macarena · Inicio">
+      <span class="brand-mark brand-mark--logo" aria-hidden="true">
+        <img src="../static/marca/logo-oxblood.png" alt="" width="520" height="466" />
+      </span>
+      <!-- Monograma anterior (por si algún día quieres volver a él):
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="36" height="36">
+          <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <text x="50%" y="62%" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="22" font-weight="600" fill="currentColor">M</text>
+        </svg>
+      </span>
+      -->
+      <span class="brand-text">
+        <span class="brand-name">Ibéricos Macarena</span>
+        <span class="brand-sub">Bollullos · desde 2024</span>
+      </span>
+    </a>
+
+    <!-- Status pill: estado abierto/cerrado en el header -->
+    <a class="status-pill" id="statusPill" href="index.html#contacto" aria-label="Estado del establecimiento">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-text">Cargando…</span>
+    </a>
+
+    <!-- Botón hamburguesa: siempre visible (escritorio + móvil) -->
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navDrawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<aside class="nav-drawer" id="navDrawer" aria-label="Navegación principal" aria-hidden="true">
+  <div class="nav-drawer-head">
+    <span class="nav-drawer-title">Menú</span>
+    <button class="nav-drawer-close" id="navClose" type="button" aria-label="Cerrar menú">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <nav class="nav" aria-label="Navegación">
+    <a href="index.html"      data-nav><span class="nav-num">01</span><span class="nav-label">Inicio</span></a>
+    <a href="index.html#productos"   data-nav><span class="nav-num">02</span><span class="nav-label">Productos</span></a>
+    <a href="index.html#nosotros"    data-nav><span class="nav-num">03</span><span class="nav-label">Nosotros</span></a>
+    <a href="index.html#resenas"     data-nav><span class="nav-num">04</span><span class="nav-label">Reseñas</span></a>
+    <a href="galeria.html" data-nav aria-current="page"><span class="nav-num">05</span><span class="nav-label">Galería</span></a>
+    <a href="index.html#contacto"    data-nav><span class="nav-num">06</span><span class="nav-label">Contacto</span></a>
+  </nav>
+
+  <div class="nav-drawer-foot">
+    <!-- Anónimo -->
+    <button class="btn btn-primary btn-block is-hidden" data-open-auth="login" type="button" id="navLogin">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      <span>Acceder</span>
+    </button>
+
+    <!-- Autenticado -->
+    <div class="user-menu is-hidden" id="userMenu">
+      <button class="user-trigger" type="button" id="userTrigger" aria-haspopup="true" aria-expanded="false">
+        <span class="user-avatar" id="userAvatar" aria-hidden="true">?</span>
+        <span class="user-name" id="userName">Usuario</span>
+        <svg class="user-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="user-dropdown" id="userDropdown" role="menu">
+        <div class="user-dropdown-head">
+          <strong id="userFullName">—</strong>
+          <small id="userEmail">—</small>
+        </div>
+        <button type="button" role="menuitem" id="logoutBtn" class="user-dropdown-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="nav-drawer-meta">Av. Constitución 15 · Bollullos Par del Condado</p>
+  </div>
+</aside>
+
+<main>
+<section class="section gallery gallery-page" id="galeria">
+  <div class="container">
+    <header class="page-head reveal">
+      <p class="eyebrow">Galería</p>
+      <h1 class="page-title">La <em>tienda</em> en imágenes</h1>
+      <p class="section-lead">Producto, mostrador y ambiente. Así es Ibéricos Macarena por dentro: jamones curándose, la vitrina cada mañana y el corte a cuchillo de cada día.</p>
+      <a class="page-back" href="index.html">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Volver al inicio
+      </a>
+    </header>
+
+    <div class="gallery-grid reveal" id="galleryGrid">
+      <div class="gallery-empty">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="9" cy="9" r="2"/>
+          <path d="M21 15l-5-5-11 11"/>
+        </svg>
+        <h3>Galería en construcción</h3>
+        <p>Estamos preparando las fotos del local y el producto. Vuelve en unos días.</p>
+      </div>
+    </div>
+
+    <div class="gallery-foot reveal">
+      <p>¿Te has quedado con ganas? Pásate por la tienda.</p>
+      <a class="btn btn-primary" href="index.html#contacto">
+        <span>Cómo llegar</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Cerrar">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <button class="lightbox-prev" id="lightboxPrev" type="button" aria-label="Anterior">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="lightbox-next" id="lightboxNext" type="button" aria-label="Siguiente">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <figure class="lightbox-figure">
+    <img id="lightboxImg" alt="" />
+    <figcaption id="lightboxCaption"></figcaption>
+  </figure>
+</div>
+
+<!-- Acceso -->
+<div class="auth-overlay" id="authOverlay" aria-hidden="true">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="auth-close" id="authClose" aria-label="Cerrar">×</button>
+
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab is-active" data-tab="login" role="tab" aria-selected="true">Acceder</button>
+      <button class="auth-tab" data-tab="register" role="tab" aria-selected="false">Crear cuenta</button>
+    </div>
+
+    <div class="auth-panels">
+      <!-- LOGIN -->
+      <form class="auth-form is-active" data-panel="login" id="loginForm" novalidate>
+        <h3 id="authTitle" class="auth-title">Bienvenida de vuelta</h3>
+        <p class="auth-sub">Accede para ver tus pedidos y favoritos.</p>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label class="field">
+          <span>Contraseña</span>
+          <input type="password" name="password" required autocomplete="current-password" minlength="8" />
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <p class="auth-switch">¿Aún no tienes cuenta? <button type="button" data-switch="register" class="btn-link">Crear una</button></p>
+        <p class="auth-feedback" data-feedback></p>
+      </form>
+
+      <!-- REGISTER -->
+      <form class="auth-form" data-panel="register" id="registerForm" novalidate>
+        <h3 class="auth-title">Crea tu cuenta</h3>
+        <p class="auth-sub">Para pedidos rápidos y acceso a novedades.</p>
+
+        <label class="field">
+          <span>Nombre</span>
+          <input type="text" name="name" required autocomplete="name" />
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label class="field">
+          <span>Contraseña</span>
+          <input type="password" name="password" required autocomplete="new-password" minlength="8" />
+          <small class="field-hint">Mínimo 8 caracteres, con al menos una letra y un número.</small>
+        </label>
+        <label class="field check">
+          <input type="checkbox" name="terms" required />
+          <span>He leído y acepto la <a href="privacidad.html" target="_blank">política de privacidad</a> y la <a href="cookies.html" target="_blank">política de cookies</a>.</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+        <p class="auth-switch">¿Ya tienes cuenta? <button type="button" data-switch="login" class="btn-link">Acceder</button></p>
+        <p class="auth-feedback" data-feedback></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <img class="footer-logo" src="../static/marca/logo-bone.png"
+           alt="Ibéricos Macarena · Todo un Placer" width="520" height="466" loading="lazy" />
+      <span class="brand-name">Ibéricos Macarena</span>
+      <p>Charcutería artesanal en el corazón del Condado de Huelva. Producto, tiempo y oficio.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Tienda</h4>
+      <a href="index.html#productos">Productos</a>
+      <a href="index.html#nosotros">Nosotros</a>
+      <a href="index.html#resenas">Reseñas</a>
+      <a href="galeria.html">Galería</a>
+    </div>
+    <div class="footer-col">
+      <h4>Visita</h4>
+      <a href="index.html#contacto">Contacto</a>
+      <a href="https://www.google.com/maps?q=Av.+Constitución+15+Bollullos+Par+del+Condado" target="_blank" rel="noopener">Cómo llegar</a>
+      <a href="tel:+34616778900">Teléfono</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="privacidad.html">Política de privacidad</a>
+      <a href="cookies.html">Política de cookies</a>
+      <a href="aviso-legal.html">Aviso legal</a>
+      <button type="button" class="btn-link" data-cookie-open>Configurar cookies</button>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <small>© <span id="year"></span> Ibéricos Macarena · Av. Constitución 15, 21710 Bollullos Par del Condado, Huelva</small>
+    <small>Hecho con cariño en el Condado.</small>
+  </div>
+</footer>
+
+<!-- Cookies -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Aviso de cookies" hidden>
+  <div class="cookie-inner">
+    <div class="cookie-text">
+      <strong>🍪 Sobre las cookies</strong>
+      <p>Utilizamos cookies propias y de terceros para analítica y mejorar la experiencia. Puedes aceptarlas, rechazarlas o configurarlas. Más info en nuestra <a href="cookies.html">política de cookies</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button class="btn btn-ghost" data-cookie="reject">Rechazar</button>
+      <button class="btn btn-outline" data-cookie="config">Configurar</button>
+      <button class="btn btn-primary" data-cookie="accept">Aceptar todas</button>
+    </div>
+  </div>
+</div>
+
+<div class="cookie-config" id="cookieConfig" aria-hidden="true">
+  <div class="cookie-config-modal" role="dialog" aria-modal="true" aria-labelledby="cookieCfgTitle">
+    <button class="auth-close" data-cookie="close" aria-label="Cerrar">×</button>
+    <h3 id="cookieCfgTitle">Configura tus cookies</h3>
+    <p class="auth-sub">Elige qué tipos quieres permitir. Tu decisión se guarda en este dispositivo.</p>
+
+    <label class="cookie-toggle">
+      <div>
+        <strong>Necesarias</strong>
+        <small>Imprescindibles para que la web funcione (siempre activas).</small>
+      </div>
+      <input type="checkbox" checked disabled />
+    </label>
+    <label class="cookie-toggle">
+      <div>
+        <strong>Analítica</strong>
+        <small>Nos ayudan a entender cómo se usa la web (anónimas).</small>
+      </div>
+      <input type="checkbox" id="cookieAnalytics" />
+    </label>
+    <label class="cookie-toggle">
+      <div>
+        <strong>Marketing</strong>
+        <small>Para mostrar contenido y ofertas relevantes.</small>
+      </div>
+      <input type="checkbox" id="cookieMarketing" />
+    </label>
+
+    <div class="cookie-config-actions">
+      <button class="btn btn-ghost" data-cookie="reject">Rechazar todo</button>
+      <button class="btn btn-primary" data-cookie="save">Guardar preferencias</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  window.GALLERY_IMAGES = [
+    { thumb: "../static/galeria/thumb/galeria-25.webp", src: "../static/galeria/full/galeria-25.webp",
+      alt: "Interior de Ibéricos Macarena con los jamones colgados", caption: "Nuestra tienda" },
+    { thumb: "../static/galeria/thumb/galeria-22.webp", src: "../static/galeria/full/galeria-22.webp",
+      alt: "Macarena cortando jamón a cuchillo en la tienda", caption: "Cortado a cuchillo" },
+    { thumb: "../static/galeria/thumb/galeria-24.webp", src: "../static/galeria/full/galeria-24.webp",
+      alt: "Vitrina con embutidos, chacinas y quesos", caption: "Vitrina del día" },
+    { thumb: "../static/galeria/thumb/galeria-06.webp", src: "../static/galeria/full/galeria-06.webp",
+      alt: "Expositor de la charcutería con producto curado", caption: "Curados" },
+    { thumb: "../static/galeria/thumb/galeria-23.webp", src: "../static/galeria/full/galeria-23.webp",
+      alt: "Jamón ibérico loncheado a cuchillo sobre tabla de madera", caption: "Plato de jamón", tall: true },
+    { thumb: "../static/galeria/thumb/galeria-01.webp", src: "../static/galeria/full/galeria-01.webp",
+      alt: "Tabla de ibéricos y queso preparada para llevar", caption: "Tabla preparada" },
+    { thumb: "../static/galeria/thumb/galeria-02.webp", src: "../static/galeria/full/galeria-02.webp",
+      alt: "Bandeja de queso curado en cuñas", caption: "Queso en cuña" },
+    { thumb: "../static/galeria/thumb/galeria-16.webp", src: "../static/galeria/full/galeria-16.webp",
+      alt: "Jamones ibéricos curándose en la tienda", caption: "En curación" },
+    { thumb: "../static/galeria/thumb/galeria-03.webp", src: "../static/galeria/full/galeria-03.webp",
+      alt: "Jamones y paletas colgados en la pared de la tienda", caption: "Jamones y paletas" },
+    { thumb: "../static/galeria/thumb/galeria-10.webp", src: "../static/galeria/full/galeria-10.webp",
+      alt: "Mostrador de Ibéricos Macarena con producto del día", caption: "El mostrador" },
+    { thumb: "../static/galeria/thumb/galeria-04.webp", src: "../static/galeria/full/galeria-04.webp",
+      alt: "Expositor refrigerado con quesos y embutidos", caption: "Quesos y embutidos" },
+    { thumb: "../static/galeria/thumb/galeria-11.webp", src: "../static/galeria/full/galeria-11.webp",
+      alt: "Chorizos y quesos en el mostrador de la charcutería", caption: "Chorizo casero", tall: true },
+    { thumb: "../static/galeria/thumb/galeria-14.webp", src: "../static/galeria/full/galeria-14.webp",
+      alt: "Jamón ibérico colgado con su etiqueta", caption: "Pieza entera" },
+    { thumb: "../static/galeria/thumb/galeria-15.webp", src: "../static/galeria/full/galeria-15.webp",
+      alt: "Selección de jamones premium en la tienda", caption: "Selección premium" },
+    { thumb: "../static/galeria/thumb/galeria-19.webp", src: "../static/galeria/full/galeria-19.webp",
+      alt: "Jamones ibéricos etiquetados uno a uno", caption: "Uno a uno" },
+    { thumb: "../static/galeria/thumb/galeria-20.webp", src: "../static/galeria/full/galeria-20.webp",
+      alt: "Detalle de jamón ibérico curado", caption: "Al detalle" },
+    { thumb: "../static/galeria/thumb/galeria-21.webp", src: "../static/galeria/full/galeria-21.webp",
+      alt: "Producto de Ibéricos Macarena preparado para el cliente", caption: "Te esperamos" }
+  ];
+</script>
+
+<script src="../JS/script.js" defer></script>
+</body>
+</html>

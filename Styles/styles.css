@@ -2578,3 +2578,168 @@ body {
   display: inline;
 }
 .hero-meta .label::before { content: none; }
+
+/* =============================================================
+   FOTOS REALES (v5)
+============================================================= */
+
+/* ── Foto de fachada en la sección "Nosotros" ────────────────
+   Cuando el marco contiene una foto real, cambiamos la
+   proporción a 4/3 (la del original) para no recortar el rótulo,
+   y quitamos el degradado del placeholder.
+*/
+.about-photo.has-photo {
+  aspect-ratio: 4 / 3;
+  background: var(--bone-deep);
+  display: block;
+}
+.about-photo.has-photo::before { opacity: .07; } /* grano casi imperceptible */
+.about-photo.has-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 1.2s var(--ease);
+}
+.about-frame:hover .about-photo.has-photo img {
+  transform: scale(1.03);
+}
+
+/* ── Galería con fotos: fondo neutro mientras cargan ─────────
+*/
+.gallery-grid .gallery-item {
+  background: var(--bone-deep);
+}
+
+/* ── Formas explícitas en la galería ─────────────────────────
+   Por defecto la cuadrícula reparte tamaños automáticamente,
+   pero una foto panorámica en una celda cuadrada queda muy
+   recortada. Con `wide: true` / `tall: true` en GALLERY_IMAGES
+   se le puede dar a una foto la forma que le corresponde.
+   Van al final del archivo para ganar a las reglas nth-child.
+*/
+.gallery-grid .gallery-item.is-wide {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+.gallery-grid .gallery-item.is-tall {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+@media (max-width: 720px) {
+  .gallery-grid .gallery-item.is-tall { grid-row: span 1; }
+}
+
+/* =============================================================
+   MARCA (v7) · logo real "Todo un Placer!"
+============================================================= */
+
+/* ── Logo en el header ───────────────────────────────────────
+   El arte original es blanco sobre rojo; aquí usamos la versión
+   recortada y teñida en oxblood para que no rompa la paleta.
+*/
+.brand-mark--logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 42px;
+  border: 0;
+  background: none;
+  flex-shrink: 0;
+}
+.brand-mark--logo img {
+  height: 100%;
+  width: auto;
+  display: block;
+  transition: transform .5s cubic-bezier(.7, 0, .2, 1);
+}
+.brand:hover .brand-mark--logo img {
+  transform: rotate(-3deg) scale(1.04);
+}
+@media (max-width: 600px) {
+  .brand-mark--logo { height: 34px; }
+}
+
+/* ── Logo en el footer (versión hueso sobre fondo oscuro) ──── */
+.footer-logo {
+  display: block;
+  height: 74px;
+  width: auto;
+  margin-bottom: 18px;
+  opacity: .92;
+}
+@media (max-width: 880px) {
+  .footer-logo { height: 62px; }
+}
+
+/* =============================================================
+   GALERÍA · adelanto en la home + página propia
+============================================================= */
+
+/* Adelanto: solo 6 fotos, todas del mismo tamaño (sin mosaico) */
+.gallery-grid--preview {
+  grid-auto-rows: 230px;
+}
+.gallery-grid--preview .gallery-item:nth-child(7n+1),
+.gallery-grid--preview .gallery-item:nth-child(7n+5) {
+  grid-column: span 1;
+  grid-row: span 1;
+}
+
+/* Pie de la galería: frase + botón */
+.gallery-foot {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.gallery-foot p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15.5px;
+}
+
+/* ── Cabecera de la página de galería ─────────────────────── */
+.gallery-page { padding-top: 140px; }
+.page-head {
+  max-width: 760px;
+  margin: 0 auto 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.page-title {
+  font-family: var(--ff-display);
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin: 0;
+  font-variation-settings: "opsz" 144, "SOFT" 60;
+}
+.page-title em { color: var(--oxblood); }
+.page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  transition: color .2s var(--ease), gap .2s var(--ease);
+}
+.page-back:hover { color: var(--oxblood); gap: 12px; }
+
+/* Enlace del menú marcado como página actual */
+.nav-drawer .nav a[aria-current="page"] {
+  color: var(--oxblood);
+}
+.nav-drawer .nav a[aria-current="page"] .nav-num::after {
+  transform: scaleX(1);
+}

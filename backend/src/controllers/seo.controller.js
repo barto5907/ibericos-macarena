@@ -18,7 +18,7 @@ const BUSINESS = {
   alternateName: "Charcutería Ibéricos Macarena",
   description:
     "Charcutería especializada en productos ibéricos premium en Bollullos Par del Condado, Huelva. Jamón, paleta, lomo y embutidos artesanales.",
-  url: "https://ibericosmacarena.es",
+  url: "https://ibericosmacarena.com",
   telephone: "+34 616 778 900",
   email: "ibericosmacarena@gmail.com",
   address: {
@@ -28,7 +28,7 @@ const BUSINESS = {
     postalCode: "21710",
     addressCountry: "ES",
   },
-  geo: { latitude: 37.3411, longitude: -6.5378 },
+  geo: { latitude: 37.33956, longitude: -6.53744 },
   founder: "Macarena",
   foundingDate: "2024",
 };
@@ -91,6 +91,9 @@ export async function sitemap(_req, res) {
 
   const urls = [
     { loc: `${BUSINESS.url}/`, priority: "1.0", changefreq: "weekly" },
+    // La galería sí se indexa: tiene contenido propio y las fotos
+    // pueden posicionar en Google Imágenes gracias a los alt.
+    { loc: `${BUSINESS.url}/galeria`, priority: "0.6", changefreq: "monthly" },
     // Las páginas legales (cookies, privacidad, aviso) NO se incluyen
     // porque tienen <meta name="robots" content="noindex"> — incluirlas
     // genera warnings en Search Console.

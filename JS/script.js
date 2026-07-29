@@ -887,9 +887,11 @@
   function renderGallery(images) {
     if (!galleryGrid || !Array.isArray(images) || images.length === 0) return;
     galleryImages = images;
+    // La cuadrícula carga la versión ligera (thumb). La grande (src) solo
+    // se descarga cuando el visitante amplía una foto en el lightbox.
     galleryGrid.innerHTML = images.map((img, i) => `
-      <figure class="gallery-item" data-index="${i}" tabindex="0" role="button" aria-label="Ampliar: ${escapeHtml(img.caption || img.alt || '')}">
-        <img src="${escapeHtml(img.src)}"
+      <figure class="gallery-item${img.wide ? " is-wide" : ""}${img.tall ? " is-tall" : ""}" data-index="${i}" tabindex="0" role="button" aria-label="Ampliar: ${escapeHtml(img.caption || img.alt || '')}">
+        <img src="${escapeHtml(img.thumb || img.src)}"
              alt="${escapeHtml(img.alt || '')}"
              loading="lazy"
              decoding="async" />
@@ -913,8 +915,19 @@
     lightboxIndex = index;
     const img = galleryImages[index];
     if (!img) return;
-    lightboxImg.src = img.src;
+    // Mostramos primero la versión ligera (ya está en caché del navegador)
+    // y la sustituimos por la grande en cuanto termine de descargarse.
+    // Así nunca se ve un hueco en blanco al ampliar.
+    lightboxImg.src = img.thumb || img.src;
     lightboxImg.alt = img.alt || "";
+    if (img.thumb && img.src && img.thumb !== img.src) {
+      const full = new Image();
+      full.onload = () => {
+        // Solo aplicar si el visitante sigue viendo esta misma foto
+        if (galleryImages[lightboxIndex] === img) lightboxImg.src = img.src;
+      };
+      full.src = img.src;
+    }
     lightboxCaption.textContent = img.caption || "";
     lightbox.hidden = false;
     requestAnimationFrame(() => lightbox.classList.add("is-open"));
