@@ -1,263 +1,195 @@
-# Ibéricos Macarena · Proyecto completo
+# Backend · Ibéricos Macarena
 
-Web + API para Ibéricos Macarena, charcutería en **Bollullos Par del Condado, Huelva**.
+API en Node.js + Express + Prisma + PostgreSQL. Además de servir la API,
+**sirve el frontend entero** (HTML, CSS, JS e imágenes), así que en producción
+todo va bajo el mismo dominio y no hace falta CORS entre partes.
 
-- 🎨 **Frontend** estático: HTML / CSS / JS sin frameworks.
-- ⚡ **Backend** Node.js + Express + Prisma + PostgreSQL.
-- 🔐 Autenticación JWT en cookie httpOnly + bcrypt.
-- 🌍 SEO local: JSON-LD con `AggregateRating` real, `sitemap.xml` y `robots.txt` dinámicos.
-- 🧱 Listo para producción detrás de Nginx / Cloudflare / Render.
+En producción: https://ibericosmacarena.com
 
 ---
 
-## 🚀 Arranque inmediato (sin base de datos)
+## Arrancar en local
 
-```bash
-cd backend
-cp .env.example .env
+```powershell
+cd D:\Documentos\ibericos-macarena\backend
+cp .env.example .env      # y rellenar los valores
 npm install
 npm run dev
 ```
 
-Abre **http://localhost:4000/** — el backend sirve el frontend en `Ibéricos Macarena/HTML/index.html` y la API en `/api/*`. Como `DATABASE_URL` está vacío, arranca en **modo memoria** con datos simulados.
+→ http://localhost:4000
+
+Si `DATABASE_URL` está vacía, el servidor arranca igualmente **en modo memoria**
+con datos simulados. Útil para probar sin base de datos, pero ojo: entonces
+nada de lo que se cree persiste.
 
 ---
 
-## 📂 Estructura del proyecto
+## Scripts
 
-```
-Ibéricos Macarena/
-├── HTML/                  ← páginas
-│   ├── index.html
-│   └── cookies.html
-├── Styles/                ← CSS
-│   └── styles.css
-├── JS/                    ← JavaScript del frontend
-│   └── script.js
-└── backend/               ← API + servidor estático
-    ├── server.js          entry point
-    ├── package.json
-    ├── README.md          (este archivo)
-    ├── .env.example       plantilla de variables
-    ├── .gitignore
-    ├── prisma/
-    │   └── schema.prisma  modelos User · Product · Review
-    └── src/
-        ├── app.js         configuración Express
-        ├── config/        env, prisma
-        ├── routes/        auth, products, reviews, seo
-        ├── controllers/   capa HTTP
-        ├── services/      lógica de negocio (BD ↔ memoria)
-        ├── middleware/    auth, validate, rate-limit, errores
-        ├── utils/         JWT, ApiError, logger…
-        └── data/          seedProducts, seedReviews, seed
-```
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor con recarga automática (nodemon) |
+| `npm start` | Servidor sin recarga (es el que usa Render) |
+| `npm run prisma:generate` | Regenera el cliente de Prisma tras tocar el schema |
+| `npm run prisma:migrate` | Crea y aplica una migración en local |
+| `npm run prisma:deploy` | Aplica migraciones existentes (producción) |
+| `npm run prisma:studio` | Interfaz web para ver/editar la base de datos |
+| `npm run prisma:seed` | Siembra productos · `-- --force` actualiza los existentes |
 
 ---
 
-## 🔌 Endpoints
+## Estructura
 
-| Método | Ruta                          | Auth      | Descripción |
-| ------ | ----------------------------- | --------- | ----------- |
-| GET    | `/`                           | —         | Frontend (index.html) |
-| GET    | `/cookies`                    | —         | Política de cookies |
-| GET    | `/sitemap.xml`                | —         | Sitemap dinámico (incluye productos) |
-| GET    | `/robots.txt`                 | —         | Robots.txt |
-| GET    | `/api/health`                 | —         | Estado del servicio |
-| GET    | `/api/products`               | —         | Catálogo (`?category=`, `?featured=`, `?search=`) |
-| GET    | `/api/products/:slug`         | —         | Detalle por slug |
-| GET    | `/api/reviews`                | —         | Reseñas APPROVED + `summary{average,count}` |
-| POST   | `/api/reviews`                | —         | Crear reseña |
-| POST   | `/api/auth/register`          | —         | Registro · cookie httpOnly |
-| POST   | `/api/auth/login`             | —         | Login · cookie httpOnly |
-| POST   | `/api/auth/logout`            | —         | Cierra sesión |
-| GET    | `/api/auth/me`                | requerida | Usuario autenticado |
-| GET    | `/api/seo/local-business`     | —         | JSON-LD `LocalBusiness` con rating real |
-
----
-
-## 🐘 Configuración con PostgreSQL (paso a paso)
-
-### 1) Instalar PostgreSQL
-
-**macOS** (con Homebrew):
-```bash
-brew install postgresql@16
-brew services start postgresql@16
 ```
-
-**Ubuntu / Debian**:
-```bash
-sudo apt update
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl enable --now postgresql
-```
-
-**Windows**: descarga el instalador desde <https://www.postgresql.org/download/windows/>.
-
-**Alternativa cero-instalación** — usa un servicio gratuito:
-[Supabase](https://supabase.com), [Neon](https://neon.tech), [Render PostgreSQL](https://render.com/docs/databases) o [Railway](https://railway.app). Te dan una `DATABASE_URL` lista para pegar.
-
-### 2) Crear usuario y base de datos
-
-```bash
-# Entrar al cliente de psql como superusuario
-sudo -u postgres psql      # Linux
-psql postgres              # macOS
-
-# Dentro de psql:
-CREATE USER macarena WITH PASSWORD 'cambia_esta_password';
-CREATE DATABASE ibericos_macarena OWNER macarena;
-GRANT ALL PRIVILEGES ON DATABASE ibericos_macarena TO macarena;
-\q
-```
-
-### 3) Configurar `.env`
-
-```env
-DATABASE_URL=postgresql://macarena:cambia_esta_password@localhost:5432/ibericos_macarena?schema=public
-JWT_SECRET=ejecuta_openssl_rand_hex_64_y_pega_aqui
-NODE_ENV=development
-```
-
-### 4) Crear tablas y rellenar con datos iniciales
-
-```bash
-cd backend
-npm install
-npm run prisma:generate    # genera el cliente Prisma
-npm run prisma:migrate     # crea tablas (te pedirá nombre de migración)
-npm run prisma:seed        # productos + reseñas iniciales
-npm run dev                # arranca el servidor
-```
-
-Visita **http://localhost:4000** — la web ya carga productos y reseñas desde la base de datos real.
-
-### 5) Inspeccionar la BD (opcional)
-
-```bash
-npm run prisma:studio      # UI web en http://localhost:5555
+backend/
+├── server.js                  punto de entrada · timeouts anti-slowloris
+├── .env                       credenciales (NO se sube a Git)
+├── .env.example               plantilla
+├── prisma/
+│   ├── schema.prisma          modelos User · Product · Review
+│   └── migrations/
+└── src/
+    ├── app.js                 Express, Helmet, CORS, sirve el frontend
+    ├── config/
+    │   ├── env.js             validación de variables con Zod
+    │   └── prisma.js          conexión y detección de si hay BD
+    ├── routes/                auth · products · reviews · seo · business
+    ├── controllers/           capa HTTP
+    ├── services/              lógica de negocio (con respaldo en memoria)
+    ├── middleware/            auth, validate, rateLimit, error, notFound
+    ├── utils/
+    │   ├── jwt.js
+    │   ├── businessHours.js   ← horarios verano/invierno y estado actual
+    │   ├── ApiError.js
+    │   └── logger.js
+    └── data/
+        ├── seedProducts.js    21 productos, 8 categorías
+        ├── seedReviews.js     vacío a propósito (solo reseñas reales)
+        └── seed.js            script de siembra
 ```
 
 ---
 
-## 🔐 Seguridad incluida
+## Endpoints
 
-- **Helmet** con CSP estricta en producción.
-- **CORS** con allowlist (`FRONTEND_URL`) y `credentials: true`.
-- **bcrypt** (cost 12) para hashear contraseñas.
-- **JWT** firmado con secret de 32+ caracteres, issuer fijo.
-- Cookie de sesión **httpOnly** + `secure` en producción + `SameSite` configurable.
-- **Rate-limiting**: 10 intentos/15 min en `/api/auth/*`, 120 req/min en el resto.
-- **Zod** valida todos los inputs (body, query, params).
-- Mensajes genéricos en login fallido (anti-enumeración de usuarios).
-- `trust proxy` activado para funcionar tras Nginx / Cloudflare.
+### Páginas
 
----
+| Ruta | Sirve |
+|---|---|
+| `/` · `/inicio` | `HTML/index.html` |
+| `/galeria` | `HTML/galeria.html` (indexable, está en el sitemap) |
+| `/cookies` · `/privacidad` · `/aviso-legal` | páginas legales (con `noindex`) |
+| `/Styles/*` · `/JS/*` · `/static/*` | archivos estáticos |
 
-## 🌐 SEO local
+`/static/` se sirve con caché de 30 días en producción y acepta tanto
+`/static/...` como `/Static/...`, para evitar problemas de mayúsculas
+entre Windows y Linux.
 
-- **JSON-LD `LocalBusiness`** estático en `index.html` (lo lee Google al instante) **y** dinámico en `/api/seo/local-business` (incluye `aggregateRating` calculado desde las reseñas reales).
-- **Sitemap** dinámico (`/sitemap.xml`) que se actualiza solo cuando añades productos.
-- **Robots.txt** con `Sitemap:` apuntando a tu dominio.
-- Meta tags `geo.region`, `geo.position`, `ICBM`, Open Graph y Twitter Cards.
-- Cabeceras `Cache-Control` con `stale-while-revalidate` en endpoints públicos.
+### API
 
----
-
-## 🚢 Despliegue en producción
-
-### Render / Railway (lo más rápido)
-
-1. Crea servicio Node, apunta al directorio `backend`.
-2. Build command: `npm install && npm run prisma:generate && npm run prisma:deploy`
-3. Start command: `npm start`
-4. Variables de entorno:
-   - `NODE_ENV=production`
-   - `JWT_SECRET=<openssl rand -hex 64>`
-   - `DATABASE_URL=<la que te dan>`
-   - `COOKIE_SECURE=true`
-   - `FRONTEND_URL=https://tu-dominio.es`
-5. Conecta el dominio.
-
-### VPS propio (Nginx + PM2)
-
-```bash
-# En el servidor
-git clone <repo>
-cd "Ibéricos Macarena/backend"
-cp .env.example .env  # edita con valores de producción
-npm ci
-npm run prisma:generate
-npm run prisma:deploy
-npm i -g pm2
-pm2 start server.js --name ibericos-api
-pm2 save && pm2 startup
-```
-
-Nginx delante con proxy_pass al puerto 4000 y certificado SSL (Let's Encrypt). El backend ya sirve el frontend, no necesitas servirlo aparte.
-
-### Checklist final
-
-- [ ] `JWT_SECRET` aleatorio y largo (no dejar el de dev)
-- [ ] `DATABASE_URL` apuntando al PostgreSQL de producción
-- [ ] `COOKIE_SECURE=true` (HTTPS obligatorio)
-- [ ] `FRONTEND_URL` con tu dominio
-- [ ] `npm run prisma:deploy` ejecutado al menos una vez
-- [ ] Dominio apuntando al servidor (registros A/AAAA o CNAME a Render/Railway)
-- [ ] Sustituir teléfono y email reales en `index.html` (ya están: +34 616 778 900 e ibericosmacarena@gmail.com)
-- [ ] Subir el sitemap a Google Search Console: `https://tu-dominio.es/sitemap.xml`
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| GET | `/api/health` | — | Estado del servicio y de la base de datos |
+| GET | `/api/products` | — | Catálogo (`?category=` `?featured=` `?search=`) |
+| GET | `/api/products/:slug` | — | Detalle de un producto |
+| GET | `/api/reviews` | — | Reseñas aprobadas + media y total |
+| POST | `/api/reviews` | ✅ | Crear reseña · 3/hora por IP |
+| POST | `/api/auth/register` | — | Registro · 3/hora por IP |
+| POST | `/api/auth/login` | — | Login · 5 cada 15 min por IP |
+| POST | `/api/auth/logout` | — | Cerrar sesión |
+| GET | `/api/auth/me` | ✅ | Usuario de la sesión actual |
+| GET | `/api/business/status` | — | Abierto/cerrado + horario de la semana |
+| GET | `/api/seo/local-business` | — | JSON-LD con la valoración media real |
+| GET | `/sitemap.xml` · `/robots.txt` | — | SEO |
 
 ---
 
-## 🧪 Pruebas rápidas con curl
+## Modelos
 
-```bash
-# Frontend
-curl -I http://localhost:4000/
-curl http://localhost:4000/sitemap.xml | head
+**User** — id, name, email (único), password (bcrypt), role
+(`CUSTOMER`/`STAFF`/`ADMIN`), createdAt
 
-# API
-curl http://localhost:4000/api/health
-curl http://localhost:4000/api/products
-curl http://localhost:4000/api/reviews
-curl http://localhost:4000/api/seo/local-business
+**Product** — id, name, description, price, image, stock, slug (único),
+category, priceUnit, tag, featured, active, createdAt, updatedAt
 
-# Auth (cookie persistente)
-curl -X POST http://localhost:4000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Macarena","email":"macarena@test.com","password":"superSegura2024"}' \
-  -c /tmp/cookies.txt
+Categorías: `jamon` · `paleta` · `quesos` · `embutidos` · `loncheados` ·
+`bacalao` · `conservas` · `otros`
 
-curl http://localhost:4000/api/auth/me -b /tmp/cookies.txt
-```
+**Review** — id, name, rating (1-5), comment, status
+(`PENDING`/`APPROVED`/`REJECTED`), createdAt
 
 ---
 
-## 📦 Scripts disponibles
+## Horarios
 
-| Script                    | Para qué sirve                                |
-| ------------------------- | --------------------------------------------- |
-| `npm start`               | Arranque normal (producción).                 |
-| `npm run dev`             | Desarrollo con auto-reload (nodemon).         |
-| `npm run prisma:generate` | Genera el cliente Prisma.                     |
-| `npm run prisma:migrate`  | Crea/aplica migración (dev).                  |
-| `npm run prisma:deploy`   | Aplica migraciones (producción).              |
-| `npm run prisma:studio`   | UI web para ver/editar la BD.                 |
-| `npm run prisma:seed`     | Inserta productos y reseñas iniciales.        |
+En `src/utils/businessHours.js`. Es la **única fuente**: de ahí salen la píldora
+de "Abierto ahora / Cerrado" del header, la tabla de la sección de contacto y el
+`openingHoursSpecification` del JSON-LD que lee Google.
+
+- **Verano** (1 julio – 31 agosto): lunes a viernes, 9:00–14:00
+- **Invierno** (resto del año): lunes a viernes 9:00–14:00 y 18:00–20:00 ·
+  sábado 9:00–14:00
+- Domingo cerrado siempre
+
+Los cálculos usan la zona horaria `Europe/Madrid`, no la del servidor
+(que en Render va en UTC).
 
 ---
 
-## ❓ Preguntas frecuentes
+## Seguridad
 
-**¿Por qué arranca aunque no haya base de datos?**
-Para que puedas probar la web al instante. Los servicios detectan si Prisma está disponible y, si no, usan datos en memoria del seed. Cuando configuras `DATABASE_URL`, todo pasa a usar PostgreSQL automáticamente.
+- Contraseñas con **bcrypt** (coste 12) · mínimo 8 caracteres, con letra y número
+- Sesión en **cookie httpOnly** firmada con JWT · `SameSite=Lax` · `Secure` en producción
+- **Helmet** con CSP estricta, HSTS de 6 meses, `frame-ancestors`, `form-action`,
+  `object-src: none` y `upgrade-insecure-requests`
+- **Límites de peticiones**: login 5/15 min · registro 3/hora · reseñas 3/hora ·
+  API general 120/min
+- **Validación con Zod** en todas las entradas (rechaza objetos donde espera
+  texto, así que la inyección tipo `{"$ne":null}` no pasa)
+- El nombre de una reseña se toma **del usuario autenticado**, nunca del cuerpo
+  de la petición: no se puede firmar en nombre de otro
+- En producción no se registran en el log las rutas `/api/auth/*`, para no dejar
+  emails en los ficheros del servidor
+- Timeouts para evitar conexiones colgadas (slowloris)
 
-**¿Dónde cambio el teléfono o el email?**
-En `HTML/index.html` (header, contacto, footer y JSON-LD) y en `backend/src/controllers/seo.controller.js` (objeto `BUSINESS`).
+---
 
-**¿Cómo añado productos nuevos?**
-Edita `backend/src/data/seedProducts.js` y vuelve a hacer `npm run prisma:seed`. O simplemente créalos desde Prisma Studio (`npm run prisma:studio`).
+## Modo memoria
 
-**¿Las reseñas se moderan?**
-El service `createReview` recibe estado `APPROVED` por defecto para que la web no quede vacía si algún cliente la usa. Si quieres moderarlas antes de publicar, en `reviews.service.js` cambia el default a `"PENDING"`. Solo aparecen las APPROVED.
+Si no hay `DATABASE_URL`, o si la consulta a la base de datos falla, los
+servicios responden con los datos de `src/data/`. Sirve para que la web nunca
+se vea rota.
+
+⚠️ **Cuidado con esto:** si la tabla `Product` está vacía, la web muestra los
+productos del archivo y todo *parece* funcionar. Pero entonces editar precios
+en Prisma Studio no cambia nada, porque nadie lee esa tabla. Para saber de dónde
+vienen, mirar el campo `id` en `/api/products`: si es una cadena larga aleatoria
+viene de la base de datos; si coincide con el slug, viene del archivo.
+
+---
+
+## Despliegue (Render)
+
+| | |
+|---|---|
+| Root Directory | `backend` |
+| Build Command | `npm install --include=dev && npx prisma generate && npx prisma migrate deploy` |
+| Start Command | `npm start` |
+| Health Check | `/api/health` |
+| Región | Frankfurt (la misma que la base de datos) |
+
+El `--include=dev` es necesario: con `NODE_ENV=production`, npm se saltaría las
+devDependencies y no encontraría la herramienta `prisma`.
+
+En **Build Filters → Included Paths** está puesto `**` para que también
+despliegue cuando el cambio esté fuera de `backend/` (es decir, cuando toco
+el frontend).
+
+Variables de entorno en producción: `NODE_ENV=production`, `COOKIE_SECURE=true`,
+`JWT_SECRET` propio, `FRONTEND_URL` con el dominio **y** la URL de onrender.com
+separados por coma, y la `DATABASE_URL` **interna**.
+
+---
+
+_Última actualización: julio de 2026_
