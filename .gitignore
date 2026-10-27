@@ -10,6 +10,10 @@ backend/.env
 backend/.env.local
 backend/.env.*
 
+# Las plantillas sin valores reales sí se suben
+!.env.example
+!backend/.env.example
+
 # Logs
 *.log
 logs/
